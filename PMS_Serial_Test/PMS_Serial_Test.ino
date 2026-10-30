@@ -1,28 +1,26 @@
 #include <Arduino.h>
-#include "PMSSerial.h"
 
-// Select one backend at compile time:
-// - Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL for SoftwareSerial on pins 13/12.
-// - Define PMS_SERIAL_TEST_USE_SERIAL1 for boards wired to Serial1.
+#if __has_include("PMSSerial.h")
+#include "PMSSerial.h"
+#elif __has_include("../src/PMSSerial.h")
+#include "../src/PMSSerial.h"
+#else
+#error "PMSSerial.h not found. Install/copy this repository as an Arduino library or keep this sketch inside the repository."
+#endif
+
+// Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL to enable sensor reading on pins 13/12.
 #if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
 #include "SoftwareSerial.h"
 // (For Arduino Uno R4) any pin can be used for TX, but only the following pins can be used for RX:
 // D0, D1, D2, D3, D8, D14, D15, A1, A2, A3, A4, A5
 SoftwareSerial pmSerial(13, 12);  // RX, TX
 PMSSerial pms(pmSerial);
-#elif defined(PMS_SERIAL_TEST_USE_SERIAL1)
-PMSSerial pms(Serial1);
 #endif
-
-#if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL) || defined(PMS_SERIAL_TEST_USE_SERIAL1)
-void setup() {
-  Serial.begin(115200);
 
 #if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
+void setup() {
+  Serial.begin(115200);
   pmSerial.begin(9600);
-#elif defined(PMS_SERIAL_TEST_USE_SERIAL1)
-  Serial1.begin(9600);
-#endif
 
   delay(2000);
   Serial.println("Started!");
@@ -50,7 +48,7 @@ void loop() {
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  Serial.println("Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL or PMS_SERIAL_TEST_USE_SERIAL1.");
+  Serial.println("Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL to run the SoftwareSerial test sketch.");
 }
 
 void loop() {}

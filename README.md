@@ -5,7 +5,7 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 ## Repository layout
 
 - `/src/PMSSerial.h` / `/src/PMSSerial.cpp` - library source
-- `/PMS_Serial_Test/PMS_Serial_Test.ino` - configurable example sketch (`SoftwareSerial` or `Serial1`)
+- `/PMS_Serial_Test/PMS_Serial_Test.ino` - SoftwareSerial-focused example sketch
 
 ## Installation
 
@@ -19,10 +19,9 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 
 ## Wiring and serial settings
 
-`PMS_Serial_Test` is compile-time configurable:
+`PMS_Serial_Test` is SoftwareSerial-focused:
 
-- Define `PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` to use `SoftwareSerial` on pins `13` (RX) and `12` (TX).
-- Define `PMS_SERIAL_TEST_USE_SERIAL1` to use `Serial1`.
+- Define `PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` to enable `SoftwareSerial` on pins `13` (RX) and `12` (TX).
 
 For `SoftwareSerial` mode the wiring is:
 
@@ -32,7 +31,9 @@ For `SoftwareSerial` mode the wiring is:
 
 On Arduino Uno R4, SoftwareSerial RX is limited to supported RX-capable pins.
 
-If neither macro is defined, the sketch prints a setup message and does not start a sensor stream.
+If the macro is not defined, the sketch prints setup guidance and does not start a sensor stream.
+
+If `PMSSerial.h` is not found when compiling this sketch directly from a repository clone, keep the sketch in this repository layout so it can include `../src/PMSSerial.h`, or install this repository as a normal Arduino library.
 
 ## API
 
@@ -108,25 +109,6 @@ void loop() {
 }
 ```
 
-### HardwareSerial
+### Other Streams
 
-```cpp
-#include "PMSSerial.h"
-
-PMSSerial pms(Serial1);
-
-void setup() {
-  Serial.begin(115200);
-  Serial1.begin(9600);
-}
-
-void loop() {
-  pms.update();
-  if (pms.hasNewMeasurement()) {
-    PMSSerial::Measurement m;
-    if (pms.read(m)) {
-      // use m.pm1_0, m.pm2_5, m.pm10
-    }
-  }
-}
-```
+Any Arduino `Stream` implementation can be passed to `PMSSerial` (for example board-specific UARTs or other serial-stream adapters).
