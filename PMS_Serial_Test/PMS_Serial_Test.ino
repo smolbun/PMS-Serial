@@ -8,12 +8,39 @@
 #error "PMSSerial.h not found. Install/copy this repository as an Arduino library or keep this sketch inside the repository."
 #endif
 
-// Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL to enable sensor reading on pins 13/12.
+// SoftwareSerial backend selection:
+// - For SAMD, try SoftwareSerialZero first.
+// - For other architectures, use SoftwareSerial.h.
+// - Override header/class with PMS_SOFTWARE_SERIAL_HEADER / PMS_SOFTWARE_SERIAL_CLASS if needed.
+#if !defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
+#define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL
+#endif
+
 #if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
-#include "SoftwareSerial.h"
+#if defined(ARDUINO_ARCH_SAMD)
+#if !defined(PMS_SOFTWARE_SERIAL_HEADER)
+#if __has_include("SoftwareSerialZero.h")
+#define PMS_SOFTWARE_SERIAL_HEADER "SoftwareSerialZero.h"
+#else
+#error "SAMD detected but SoftwareSerialZero.h not found. Install a SAMD SoftwareSerial library or define PMS_SOFTWARE_SERIAL_HEADER/PMS_SOFTWARE_SERIAL_CLASS."
+#endif
+#endif
+#if !defined(PMS_SOFTWARE_SERIAL_CLASS)
+#define PMS_SOFTWARE_SERIAL_CLASS SoftwareSerial
+#endif
+#else
+#if !defined(PMS_SOFTWARE_SERIAL_HEADER)
+#define PMS_SOFTWARE_SERIAL_HEADER "SoftwareSerial.h"
+#endif
+#if !defined(PMS_SOFTWARE_SERIAL_CLASS)
+#define PMS_SOFTWARE_SERIAL_CLASS SoftwareSerial
+#endif
+#endif
+
+#include PMS_SOFTWARE_SERIAL_HEADER
 // (For Arduino Uno R4) any pin can be used for TX, but only the following pins can be used for RX:
 // D0, D1, D2, D3, D8, D14, D15, A1, A2, A3, A4, A5
-SoftwareSerial pmSerial(13, 12);  // RX, TX
+PMS_SOFTWARE_SERIAL_CLASS pmSerial(13, 12);  // RX, TX
 PMSSerial pms(pmSerial);
 #endif
 
@@ -48,7 +75,7 @@ void loop() {
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  Serial.println("Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL to run the SoftwareSerial test sketch.");
+  Serial.println("SoftwareSerial test backend is disabled.");
 }
 
 void loop() {}

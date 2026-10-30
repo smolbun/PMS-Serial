@@ -21,7 +21,12 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 
 `PMS_Serial_Test` is SoftwareSerial-focused:
 
-- Define `PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` to enable `SoftwareSerial` on pins `13` (RX) and `12` (TX).
+- The sketch enables `PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` by default.
+- On `ARDUINO_ARCH_SAMD`, it auto-selects `SoftwareSerialZero.h`.
+- On other architectures, it auto-selects `SoftwareSerial.h`.
+- You can override backend selection with:
+  - `PMS_SOFTWARE_SERIAL_HEADER` (string header macro, e.g. `"SoftwareSerial.h"`)
+  - `PMS_SOFTWARE_SERIAL_CLASS` (class macro, e.g. `SoftwareSerial`)
 
 For `SoftwareSerial` mode the wiring is:
 
@@ -30,8 +35,6 @@ For `SoftwareSerial` mode the wiring is:
 - Sensor baud: `9600`
 
 On Arduino Uno R4, SoftwareSerial RX is limited to supported RX-capable pins.
-
-If the macro is not defined, the sketch prints setup guidance and does not start a sensor stream.
 
 If `PMSSerial.h` is not found when compiling this sketch directly from a repository clone, keep the sketch in this repository layout so it can include `../src/PMSSerial.h`, or install this repository as a normal Arduino library.
 
