@@ -5,7 +5,7 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 ## Repository layout
 
 - `/src/PMSSerial.h` / `/src/PMSSerial.cpp` - library source
-- `/PMS_Serial_Test/PMS_Serial_Test.ino` - SoftwareSerial-based example sketch (Uno R4-style wiring)
+- `/PMS_Serial_Test/PMS_Serial_Test.ino` - configurable example sketch (`SoftwareSerial` or `Serial1`)
 
 ## Installation
 
@@ -14,12 +14,17 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 3. Restart Arduino IDE.
 4. Include:
    ```cpp
-   #include <PMSSerial.h>
+   #include "PMSSerial.h"
    ```
 
 ## Wiring and serial settings
 
-The included sketch keeps the original Uno R4 `SoftwareSerial` wiring:
+`PMS_Serial_Test` is compile-time configurable:
+
+- Define `PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` to use `SoftwareSerial` on pins `13` (RX) and `12` (TX).
+- Define `PMS_SERIAL_TEST_USE_SERIAL1` to use `Serial1`.
+
+For `SoftwareSerial` mode the wiring is:
 
 - Sensor TX -> Arduino pin `13` (SoftwareSerial RX)
 - Sensor RX -> Arduino pin `12` (SoftwareSerial TX)
@@ -27,8 +32,7 @@ The included sketch keeps the original Uno R4 `SoftwareSerial` wiring:
 
 On Arduino Uno R4, SoftwareSerial RX is limited to supported RX-capable pins.
 
-The provided example compiles its full sensor path on Renesas/AVR targets (such as Uno R4/AVR boards).
-For other boards, create a board-specific sketch and pass your UART `Stream` (for example `Serial1`) to `PMSSerial`.
+If neither macro is defined, the sketch prints a setup message and does not start a sensor stream.
 
 ## API
 
@@ -82,8 +86,8 @@ This only changes first-byte synchronization. The parser still expects the same 
 ### SoftwareSerial
 
 ```cpp
-#include <SoftwareSerial.h>
-#include <PMSSerial.h>
+#include "SoftwareSerial.h"
+#include "PMSSerial.h"
 
 SoftwareSerial pmSerial(13, 12);
 PMSSerial pms(pmSerial);
@@ -107,7 +111,7 @@ void loop() {
 ### HardwareSerial
 
 ```cpp
-#include <PMSSerial.h>
+#include "PMSSerial.h"
 
 PMSSerial pms(Serial1);
 
