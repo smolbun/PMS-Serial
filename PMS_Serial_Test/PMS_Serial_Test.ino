@@ -1,33 +1,18 @@
 #include <Arduino.h>
 #include <PMSSerial.h>
 
-// Default path: use Serial1 (works on boards with a hardware UART exposed as Serial1).
-// Optional path: define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL before this sketch is compiled
-// to use SoftwareSerial with the original Uno R4 example pins.
-#if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
+// This example is intentionally SoftwareSerial-based (original Uno R4 wiring).
+// To use a hardware UART on other boards, keep this parser library and write a board-specific sketch.
+#if defined(ARDUINO_ARCH_RENESAS) || defined(ARDUINO_ARCH_AVR)
 #include <SoftwareSerial.h>
 // (For Arduino Uno R4) any pin can be used for TX, but only the following pins can be used for RX:
 // D0, D1, D2, D3, D8, D14, D15, A1, A2, A3, A4, A5
 SoftwareSerial pmSerial(13, 12);  // RX, TX
-Stream& pmStream = pmSerial;
-#else
-#if !defined(HAVE_HWSERIAL1)
-#error "This example defaults to Serial1. Define PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL to use SoftwareSerial instead."
-#endif
-Stream& pmStream = Serial1;
-#endif
-
-PMSSerial pms(pmStream);
+PMSSerial pms(pmSerial);
 
 void setup() {
   Serial.begin(115200);
-
-#if defined(PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL)
   pmSerial.begin(9600);
-#else
-  Serial1.begin(9600);
-#endif
-
   delay(2000);
   Serial.println("Started!");
 }
@@ -50,3 +35,13 @@ void loop() {
     Serial.println("ug/m3\n");
   }
 }
+#else
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println("PMS_Serial_Test uses SoftwareSerial and is intended for Uno R4/AVR targets.");
+  Serial.println("Use PMSSerial with your board's Stream (for example Serial1) in a custom sketch.");
+}
+
+void loop() {}
+#endif

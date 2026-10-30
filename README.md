@@ -5,7 +5,7 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 ## Repository layout
 
 - `/src/PMSSerial.h` / `/src/PMSSerial.cpp` - library source
-- `/PMS_Serial_Test/PMS_Serial_Test.ino` - example sketch (defaults to `Serial1`, optional `SoftwareSerial`)
+- `/PMS_Serial_Test/PMS_Serial_Test.ino` - SoftwareSerial-based example sketch (Uno R4-style wiring)
 
 ## Installation
 
@@ -19,16 +19,16 @@ Reusable Arduino library for reading PMS particulate-matter sensors over a seria
 
 ## Wiring and serial settings
 
-By default, the included sketch uses `Serial1` at `9600` baud for the PMS sensor stream.
-
-If you want to use the original Uno R4 `SoftwareSerial` wiring, compile the sketch with
-`PMS_SERIAL_TEST_USE_SOFTWARE_SERIAL` defined. In that mode:
+The included sketch keeps the original Uno R4 `SoftwareSerial` wiring:
 
 - Sensor TX -> Arduino pin `13` (SoftwareSerial RX)
 - Sensor RX -> Arduino pin `12` (SoftwareSerial TX)
 - Sensor baud: `9600`
 
 On Arduino Uno R4, SoftwareSerial RX is limited to supported RX-capable pins.
+
+The provided example compiles its full sensor path on Renesas/AVR targets (such as Uno R4/AVR boards).
+For other boards, create a board-specific sketch and pass your UART `Stream` (for example `Serial1`) to `PMSSerial`.
 
 ## API
 
